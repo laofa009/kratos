@@ -101,21 +101,35 @@ func (s *Sender) SendCode(ctx context.Context, f flow.Flow, id *identity.Identit
 				return err
 			}
 
-			emailModel := email.RegistrationCodeValidModel{
-				To:               address.To,
-				RegistrationCode: rawCode,
-				Traits:           model,
-				RequestURL:       f.GetRequestURL(),
-				TransientPayload: transientPayload,
-			}
-
 			s.deps.Audit().
 				WithField("registration_flow_id", code.FlowID).
 				WithField("registration_code_id", code.ID).
 				WithSensitiveField("registration_code", rawCode).
-				Info("Sending out registration email with code.")
+				Info("Sending out registration message with code.")
 
-			if err := s.send(ctx, string(address.Via), email.NewRegistrationCodeValid(s.deps, &emailModel)); err != nil {
+			var t courier.Template
+			switch address.Via {
+			case identity.ChannelTypeEmail:
+				t = email.NewRegistrationCodeValid(s.deps, &email.RegistrationCodeValidModel{
+					To:               address.To,
+					RegistrationCode: rawCode,
+					Traits:           model,
+					RequestURL:       f.GetRequestURL(),
+					TransientPayload: transientPayload,
+				})
+			case identity.ChannelTypeSMS:
+				t = sms.NewRegistrationCodeValid(s.deps, &sms.RegistrationCodeValidModel{
+					To:               address.To,
+					RegistrationCode: rawCode,
+					Traits:           model,
+					RequestURL:       f.GetRequestURL(),
+					TransientPayload: transientPayload,
+				})
+			default:
+				return errors.WithStack(errors.New("registration code: unsupported address channel"))
+			}
+
+			if err := s.send(ctx, string(address.Via), t); err != nil {
 				return errors.WithStack(err)
 			}
 
@@ -142,7 +156,7 @@ func (s *Sender) SendCode(ctx context.Context, f flow.Flow, id *identity.Identit
 				WithField("login_flow_id", code.FlowID).
 				WithField("login_code_id", code.ID).
 				WithSensitiveField("login_code", rawCode).
-				Info("Sending out login email with code.")
+				Info("Sending out login message with code.")
 
 			var t courier.Template
 			switch address.Via {
@@ -162,6 +176,8 @@ func (s *Sender) SendCode(ctx context.Context, f flow.Flow, id *identity.Identit
 					RequestURL:       f.GetRequestURL(),
 					TransientPayload: transientPayload,
 				})
+			default:
+				return errors.WithStack(errors.New("login code: unsupported address channel"))
 			}
 
 			if err := s.send(ctx, string(address.Via), t); err != nil {
@@ -170,11 +186,12 @@ func (s *Sender) SendCode(ctx context.Context, f flow.Flow, id *identity.Identit
 
 		default:
 			return errors.WithStack(errors.New("received unknown flow type"))
-
 		}
 	}
+
 	return nil
 }
+
 
 // SendRecoveryCode sends a recovery code to the specified address
 //

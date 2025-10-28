@@ -15,7 +15,7 @@ import (
 type (
 	RegistrationCodeValid struct {
 		deps  template.Dependencies
-		model *LoginCodeValidModel
+		model *RegistrationCodeValidModel
 	}
 	RegistrationCodeValidModel struct {
 		To               string                 `json:"to"`
@@ -26,8 +26,8 @@ type (
 	}
 )
 
-func NewRegistrationCodeValid(d template.Dependencies, m *LoginCodeValidModel) *LoginCodeValid {
-	return &LoginCodeValid{deps: d, model: m}
+func NewRegistrationCodeValid(d template.Dependencies, m *RegistrationCodeValidModel) *RegistrationCodeValid {
+	return &RegistrationCodeValid{deps: d, model: m}
 }
 
 func (t *RegistrationCodeValid) PhoneNumber() (string, error) {

@@ -211,7 +211,7 @@ func (s *Strategy) registrationSendEmail(ctx context.Context, w http.ResponseWri
 		return errors.WithStack(err)
 	}
 
-	if x.IsJSONRequest(r) {
+	if x.IsJSONRequest(r) && f.Type == flow.TypeAPI {
 		s.deps.Writer().WriteCode(w, r, http.StatusBadRequest, f)
 	} else {
 		http.Redirect(w, r, f.AppendTo(s.deps.Config().SelfServiceFlowRegistrationUI(ctx)).String(), http.StatusSeeOther)

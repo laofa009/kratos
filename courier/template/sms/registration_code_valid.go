@@ -1,4 +1,3 @@
-
 // Copyright © 2023 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
@@ -19,8 +18,8 @@ type (
 	}
 	RegistrationCodeValidModel struct {
 		To               string                 `json:"to"`
-		RegistrationCode        string                 `json:"login_code"`
-		Traits         map[string]interface{} `json:"identity"`
+		RegistrationCode string                 `json:"login_code"`
+		Traits           map[string]interface{} `json:"identity"`
 		RequestURL       string                 `json:"request_url"`
 		TransientPayload map[string]interface{} `json:"transient_payload"`
 	}
@@ -51,5 +50,5 @@ func (t *RegistrationCodeValid) MarshalJSON() ([]byte, error) {
 }
 
 func (t *RegistrationCodeValid) TemplateType() template.TemplateType {
-	return template.TypeLoginCodeValid
+	return template.TypeRegistrationCodeValid
 }

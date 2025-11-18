@@ -9,7 +9,7 @@ COPY script/debug-entrypoint.sh /entrypoint.sh
 VOLUME /dockerdev
 
 WORKDIR /dockerdev
-
+COPY . .
 ENV DELVE_PORT 40000
 ENV SERVICE_NAME service
 

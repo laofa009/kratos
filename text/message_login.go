@@ -228,7 +228,8 @@ func NewLoginEmailWithCodeSent() *Message {
 	return &Message{
 		ID:   InfoSelfServiceLoginEmailWithCodeSent,
 		Type: Info,
-		Text: "An email containing a code has been sent to the email address you provided. If you have not received an email, check the spelling of the address and retry the login.",
+		// Text: "An email containing a code has been sent to the email address you provided. If you have not received an email, check the spelling of the address and retry the login.",
+		Text: "验证码已发送，请注意查收",
 	}
 }
 
